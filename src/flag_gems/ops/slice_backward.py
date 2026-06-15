@@ -1,0 +1,113 @@
+import logging
+
+import torch
+import triton
+import triton.language as tl
+
+logger = logging.getLogger(__name__)
+
+
+@triton.jit
+def slice_backward_kernel(
+    grad_output_ptr,
+    grad_input_ptr,
+    numel,
+    inner,
+    slice_len,
+    dim_size,
+    start,
+    step,
+    BLOCK_SIZE: tl.constexpr,
+):
+    pid = tl.program_id(0)
+
+    offsets = pid * BLOCK_SIZE + tl.arange(0, BLOCK_SIZE)
+
+    mask = offsets < numel
+
+    grad = tl.load(grad_output_ptr + offsets, mask=mask)
+
+    outer_idx = offsets // (slice_len * inner)
+
+    slice_idx = (offsets // inner) % slice_len
+
+    inner_idx = offsets % inner
+
+    dim_index = start + slice_idx * step
+
+    input_offset = outer_idx * dim_size * inner + dim_index * inner + inner_idx
+
+    tl.store(grad_input_ptr + input_offset, grad, mask=mask)
+
+
+def slice_backward(
+    grad_output,
+    input_sizes,
+    dim,
+    start,
+    end,
+    step,
+):
+    logger.debug("GEMS SLICE_BACKWARD")
+
+    # Handle negative input_sizes (for dynamic shapes)
+    input_sizes = [s if s >= 0 else 0 for s in input_sizes]
+
+    grad_input = torch.zeros(
+        input_sizes,
+        device=grad_output.device,
+        dtype=grad_output.dtype,
+    )
+
+    shape = list(input_sizes)
+
+    if dim < 0:
+        dim += len(shape)
+
+    outer = 1
+    for i in range(dim):
+        outer *= shape[i]
+
+    inner = 1
+    for i in range(dim + 1, len(shape)):
+        inner *= shape[i]
+
+    dim_size = shape[dim]
+
+    slice_len = grad_output.shape[dim]
+
+    # Handle negative start
+    if start < 0:
+        start += dim_size
+    start = max(0, min(start, dim_size))
+
+    # Handle end - ensure it doesn't exceed dim_size
+    if end < 0:
+        end += dim_size
+    end = max(0, min(end, dim_size))
+
+    # Validate slice_len matches the (end - start) // step
+    expected_slice_len = (end - start + step - 1) // step
+    if slice_len != expected_slice_len:
+        # Adjust to match actual grad_output shape
+        end = start + slice_len * step
+
+    numel = grad_output.numel()
+
+    BLOCK = 1024
+
+    grid = lambda meta: (triton.cdiv(numel, meta["BLOCK_SIZE"]),)
+
+    slice_backward_kernel[grid](
+        grad_output,
+        grad_input,
+        numel,
+        inner,
+        slice_len,
+        dim_size,
+        start,
+        step,
+        BLOCK_SIZE=BLOCK,
+    )
+
+    return grad_input

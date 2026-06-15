@@ -1,0 +1,102 @@
+root@sse-jq-101-76:~/JudeWorkplace# export WORK=~/JudeWorkplace
+root@sse-jq-101-76:~/JudeWorkplace# export FLAGGEMS=$WORK/FlagGems_minimax_2_7
+root@sse-jq-101-76:~/JudeWorkplace# export TEST=$WORK/TianshuOperatorTest
+root@sse-jq-101-76:~/JudeWorkplace# export PY=$(command -v python3 || command -v python)
+root@sse-jq-101-76:~/JudeWorkplace#
+root@sse-jq-101-76:~/JudeWorkplace# echo "PY=$PY"
+PY=/usr/bin/python3
+root@sse-jq-101-76:~/JudeWorkplace# $PY -V
+ST" "$FLAGGEMS/.worktrees"
+find "$FLAGGEMS/.worktrees" -maxdepth 1 -mindepth 1 -type d -name 'Python 3.12.3
+root@sse-jq-101-76:~/JudeWorkplace# pwd
+/root/JudeWorkplace
+root@sse-jq-101-76:~/JudeWorkplace# ls -ld "$FLAGGEMS" "$TEST" "$FLAGGEMS/.worktrees"
+drwxr-xr-x  21 root root  4096 Jun 15 21:33 /root/JudeWorkplace/FlagGems_minimax_2_7
+drwxr-xr-x 689 root root 32768 Jun 15 21:51 /root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees
+drwxr-xr-x   3 root root  4096 Jun 15 21:33 /root/JudeWorkplace/TianshuOperatorTest
+root@sse-jq-101-76:~/JudeWorkplace# find "$FLAGGEMS/.worktrees" -maxdepth 1 -mindepth 1 -type d -name 'gen-*' | wc -lefsmi || true
+nt("torch:", torch.__version__)
+print("has towc: invalid option -- 'e'
+rch.gcu:", hasattr(torch, "gcu"))
+if hasaTry 'wc --help' for more information.
+ttr(torch, "gcu"):
+    print("gcu available:", torch.gcroot@sse-jq-101-76:~/JudeWorkplace#
+root@sse-jq-101-76:~/JudeWorkplace# $PY - <<'PY'
+> import os
+> import torch
+>
+> print("torch:", torch.__version__)
+> print("has torch.gcu:", hasattr(torch, "gcu"))
+> if hasattr(torch, "gcu"):
+>     print("gcu available:", torch.gcu.is_available())
+>     print("gcu count:", torch.gcu.device_count())
+>     try:
+>         print("current device:", torch.gcu.current_device())
+>     except Exception as e:
+>         print("current device error:", repr(e))
+> PY
+[W615 22:03:34.648894095 gcu_caching_allocator.cpp:2944] Warning: [GCU Allocator] Static initialization: PYTORCH_GCU_ALLOC_CONF="(not set, using default)", selected_backend=native (function BackendStaticInitializer)
+torch: 2.10.0+cpu
+has torch.gcu: True
+gcu available: True
+gcu count: 1
+current device: 0
+root@sse-jq-101-76:~/JudeWorkplace# for V in CUDA_VISIBLE_DEVICES TOPS_VISIBLE_DEVICES GCU_VISIBLE_DEVICES ENFLAME_VISIBLE_DEVICES; do
+>   echo "===== $V=0 ====="
+>   env "$V=0" GEMS_VENDOR=enflame "$PY" - <<'PY'
+> import os
+> import torch
+> print("env:", {k: os.environ.get(k) for k in ["CUDA_VISIBLE_DEVICES","TOPS_VISIBLE_DEVICES","GCU_VISIBLE_DEVICES","ENFLAME_VISIBLE_DEVICES"]})
+> print("has torch.gcu:", hasattr(torch, "gcu"))
+> if hasattr(torch, "gcu"):
+>     print("gcu count:", torch.gcu.device_count())
+> PY
+> done
+===== CUDA_VISIBLE_DEVICES=0 =====
+[W615 22:03:43.093690584 gcu_caching_allocator.cpp:2944] Warning: [GCU Allocator] Static initialization: PYTORCH_GCU_ALLOC_CONF="(not set, using default)", selected_backend=native (function BackendStaticInitializer)
+env: {'CUDA_VISIBLE_DEVICES': '0', 'TOPS_VISIBLE_DEVICES': None, 'GCU_VISIBLE_DEVICES': None, 'ENFLAME_VISIBLE_DEVICES': None}
+has torch.gcu: True
+gcu count: 1
+===== TOPS_VISIBLE_DEVICES=0 =====
+[W615 22:03:48.306406763 gcu_caching_allocator.cpp:2944] Warning: [GCU Allocator] Static initialization: PYTORCH_GCU_ALLOC_CONF="(not set, using default)", selected_backend=native (function BackendStaticInitializer)
+env: {'CUDA_VISIBLE_DEVICES': None, 'TOPS_VISIBLE_DEVICES': '0', 'GCU_VISIBLE_DEVICES': None, 'ENFLAME_VISIBLE_DEVICES': None}
+has torch.gcu: True
+gcu count: 1
+===== GCU_VISIBLE_DEVICES=0 =====
+[W615 22:03:52.479672301 gcu_caching_allocator.cpp:2944] Warning: [GCU Allocator] Static initialization: PYTORCH_GCU_ALLOC_CONF="(not set, using default)", selected_backend=native (function BackendStaticInitializer)
+env: {'CUDA_VISIBLE_DEVICES': None, 'TOPS_VISIBLE_DEVICES': None, 'GCU_VISIBLE_DEVICES': '0', 'ENFLAME_VISIBLE_DEVICES': None}
+has torch.gcu: True
+gcu count: 1
+===== ENFLAME_VISIBLE_DEVICES=0 =====
+[W615 22:03:56.324636676 gcu_caching_allocator.cpp:2944] Warning: [GCU Allocator] Static initialization: PYTORCH_GCU_ALLOC_CONF="(not set, using default)", selected_backend=native (function BackendStaticInitializer)
+env: {'CUDA_VISIBLE_DEVICES': None, 'TOPS_VISIBLE_DEVICES': None, 'GCU_VISIBLE_DEVICES': None, 'ENFLAME_VISIBLE_DEVICES': '0'}
+has torch.gcu: True
+gcu count: 1
+root@sse-jq-101-76:~/JudeWorkplace# SAMPLE_WT=$(find "$FLAGGEMS/.worktrees" -maxdepth 1 -mindepth 1 -type d -name 'gen-*' | head -1)
+$SAMPLE_WT"
+
+GEMS_VENDOR=enflame PYTHONPATH=src "$PY" - <<'PY'
+import flag_gems
+print("flag_gems device:", flag_gems.devroot@sse-jq-101-76:~/JudeWorkplace# echo "SAMPLE_WT=$SAMPLE_WT"
+SAMPLE_WT=/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_
+root@sse-jq-101-76:~/JudeWorkplace# cd "$SAMPLE_WT"
+root@sse-jq-101-76:~/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_#
+ice)
+print("flag_gems vendor:", flag_gems.vendor_root@sse-jq-101-76:~/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_# GEMS_VENDOR=enflame PYTHONPATH=src "$PY" - <<'PY'
+> import flag_gems
+> print("flag_gems device:", flag_gems.device)
+> print("flag_gems vendor:", flag_gems.vendor_name)
+> PY
+[W615 22:04:08.293188247 gcu_caching_allocator.cpp:2944] Warning: [GCU Allocator] Static initialization: PYTORCH_GCU_ALLOC_CONF="(not set, using default)", selected_backend=native (function BackendStaticInitializer)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_/src/flag_gems/__init__.py", line 6, in <module>
+    from flag_gems import testing  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_/src/flag_gems/testing/__init__.py", line 3, in <module>
+    from flag_gems import runtime
+  File "/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_/src/flag_gems/runtime/__init__.py", line 3, in <module>
+    from .configloader import ConfigLoader
+  File "/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_/src/flag_gems/runtime/configloader.py", line 5, in <module>
+    import triton
+ModuleNotFoundError: No module named 'triton'

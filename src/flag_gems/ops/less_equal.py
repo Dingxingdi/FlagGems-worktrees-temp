@@ -1,0 +1,52 @@
+import logging
+
+import triton
+import triton.language as tl
+
+from flag_gems.utils import pointwise_dynamic
+
+logger = logging.getLogger(__name__)
+
+
+@pointwise_dynamic(promotion_methods=[(0, 1, "ALWAYS_BOOL")])
+@triton.jit
+def less_equal_func(x, y):
+    return x.to(tl.float32) <= y
+
+
+def less_equal(A, B):
+    logger.debug("GEMS LESS_EQUAL")
+    return less_equal_func(A, B)
+
+
+@pointwise_dynamic(is_tensor=[True, False], promotion_methods=[(0, 1, "ALWAYS_BOOL")])
+@triton.jit
+def less_equal_func_scalar(x, y):
+    return x.to(tl.float32) <= y
+
+
+def less_equal_scalar(A, B):
+    logger.debug("GEMS LESS_EQUAL SCALAR")
+    return less_equal_func_scalar(A, B)
+
+
+@pointwise_dynamic(is_tensor=[True, True], promotion_methods=[(0, 1, "ALWAYS_BOOL")])
+@triton.jit
+def less_equal_func_(x, y):
+    return x.to(tl.float32) <= y
+
+
+def less_equal_(A, B):
+    logger.debug("GEMS LESS_EQUAL_")
+    return less_equal_func_(A, B, out0=A)
+
+
+@pointwise_dynamic(is_tensor=[True, False], promotion_methods=[(0, 1, "ALWAYS_BOOL")])
+@triton.jit
+def less_equal_func_scalar_(x, y):
+    return x.to(tl.float32) <= y
+
+
+def less_equal_scalar_(A, B):
+    logger.debug("GEMS LESS_EQUAL_SCALAR_")
+    return less_equal_func_scalar_(A, B, out0=A)

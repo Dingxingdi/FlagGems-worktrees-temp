@@ -1,0 +1,18 @@
+import logging
+
+import triton
+
+from flag_gems.utils import pointwise_dynamic
+
+logger = logging.getLogger(__name__)
+
+
+@pointwise_dynamic(promotion_methods=[(0, 1, "DEFAULT")])
+@triton.jit
+def __irshift__kernel(a, b):
+    return a >> b
+
+
+def __irshift__(self, other, *, out=None):
+    logger.debug("GEMS __IRSHIFT__")
+    return __irshift__kernel(self, other, out=out)

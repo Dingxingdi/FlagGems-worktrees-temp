@@ -1,0 +1,109 @@
+import logging
+
+import torch
+import triton
+
+from flag_gems.ops.topk import topk as gems_topk
+
+logger = logging.getLogger(__name__)
+
+
+def kthvalue(inp, k, dim=-1, keepdim=False):
+    """
+    Returns the kth smallest elements and their indices along the given dimension.
+
+    This implementation uses topk with largest=False to get the k smallest elements,
+    then extracts the kth element from the result.
+    """
+    logger.debug("GEMS KTHVALUE")
+
+    # Handle negative dim
+    if dim < 0:
+        dim = dim + inp.ndim
+
+    # Get dimensions
+    ndim = inp.ndim
+    dim_size = inp.shape[dim]
+
+    # Clamp k to valid range [1, dim_size]
+    if k < 1:
+        k = 1
+    if k > dim_size:
+        k = dim_size
+
+    # Handle empty tensor
+    if inp.numel() == 0:
+        out_shape = list(inp.shape)
+        if keepdim:
+            out_shape[dim] = 1
+        else:
+            del out_shape[dim]
+        return (
+            torch.empty(out_shape, dtype=inp.dtype, device=inp.device),
+            torch.empty(out_shape, dtype=torch.int64, device=inp.device),
+        )
+
+    # Determine if we need to transpose
+    need_transpose = dim != ndim - 1
+
+    if need_transpose:
+        # Transpose so that dim becomes the last dimension
+        perm = list(range(ndim))
+        perm[dim] = ndim - 1
+        perm[-1] = dim
+        inp = inp.permute(perm).contiguous()
+
+    # Use topk to get k smallest elements (sorted ascending)
+    values, indices = gems_topk(inp, k, dim=-1, largest=False, sorted=True)
+
+    # Extract the kth element (index k-1 in 0-indexed)
+    slice_idx = k - 1
+    if k == 1:
+        # For k=1, no need to slice, just use as is
+        values_kth = values
+        indices_kth = indices
+    else:
+        # Extract the (k-1)th element along the last dimension
+        # Handle different ndim cases
+        if ndim == 1:
+            values_kth = values[slice_idx:slice_idx + 1]
+            indices_kth = indices[slice_idx:slice_idx + 1]
+        elif ndim == 2:
+            if need_transpose:
+                # After transpose, it's (other_dim, k)
+                values_kth = values[:, slice_idx:slice_idx + 1]
+                indices_kth = indices[:, slice_idx:slice_idx + 1]
+            else:
+                # Original orientation: (batch, k)
+                values_kth = values[:, slice_idx:slice_idx + 1]
+                indices_kth = indices[:, slice_idx:slice_idx + 1]
+        else:
+            # For higher dimensions
+            values_kth = values[..., slice_idx:slice_idx + 1]
+            indices_kth = indices[..., slice_idx:slice_idx + 1]
+
+    if need_transpose:
+        # Transpose back
+        # After topk with k=1 on transposed input, values_kth shape is (other_dims, 1)
+        # We need to permute back
+        # Original perm maps: dim -> last, last -> dim
+        # Inverse perm should map: last -> dim, dim -> last
+        inv_perm = list(range(ndim))
+        inv_perm[dim] = ndim - 1
+        inv_perm[-1] = dim
+
+        values = values_kth.permute(inv_perm)
+        indices = indices_kth.permute(inv_perm)
+
+        if not keepdim:
+            values = values.squeeze(dim)
+            indices = indices.squeeze(dim)
+    else:
+        if not keepdim:
+            values = values_kth.squeeze(-1)
+            indices = indices_kth.squeeze(-1)
+        else:
+            values = values_kth
+            indices = indices_kth
+
+    return values, indices

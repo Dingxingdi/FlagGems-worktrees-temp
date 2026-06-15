@@ -1,0 +1,34 @@
+import logging
+
+import torch
+import triton
+import triton.language as tl
+
+from flag_gems.runtime import torch_device_fn
+
+logger = logging.getLogger(__name__)
+
+
+@triton.jit
+def sym_stride_kernel(x):
+    # Return 1 for all elements - stride info is metadata, not computed
+    # This kernel is a placeholder since sym_stride returns tensor metadata
+    return 1
+
+
+def sym_stride(A):
+    """Returns the stride of the input tensor.
+
+    This operator returns the stride of the input tensor as a list of integers.
+    It is used for torch.compile symbolic tracing.
+    """
+    logger.debug("GEMS sym_stride")
+    # sym_stride returns tensor metadata (stride), not a computed tensor
+    # For FlagGems integration, we return the actual stride
+    return A.stride()
+
+
+def sym_stride_(A):
+    """In-place version of sym_stride (returns the same stride, tensor is unchanged)."""
+    logger.debug("GEMS sym_stride_")
+    return A.stride()

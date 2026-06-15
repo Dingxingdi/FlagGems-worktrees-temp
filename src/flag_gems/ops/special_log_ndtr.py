@@ -1,0 +1,33 @@
+import logging
+
+import triton
+import triton.language as tl
+
+from flag_gems.utils import pointwise_dynamic
+
+logger = logging.getLogger(__name__)
+
+
+@pointwise_dynamic(promotion_methods=[(0, "DEFAULT")])
+@triton.jit
+def special_log_ndtr_func(x):
+    # Compute log(cdf(x)) where cdf is the standard normal cumulative distribution
+    # cdf(x) = 0.5 * (1 + erf(x / sqrt(2)))
+    # log_ndtr(x) = log(0.5 * (1 + erf(x / sqrt(2))))
+    SQRT_HALF = 0.7071067811865476  # 1 / sqrt(2)
+    x_fp32 = x.to(tl.float32)
+    erf_result = tl.math.erf(x_fp32 * SQRT_HALF)
+    cdf_value = 0.5 * (1.0 + erf_result)
+    log_cdf = tl.log(cdf_value)
+    return log_cdf.to(x.dtype)
+
+
+def special_log_ndtr(A):
+    logger.debug("GEMS SPECIAL_LOG_NDTR")
+    return special_log_ndtr_func(A)
+
+
+def special_log_ndtr_(A):
+    logger.debug("GEMS SPECIAL_LOG_NDTR_")
+    special_log_ndtr_func(A, out0=A)
+    return A

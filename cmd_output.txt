@@ -100,3 +100,199 @@ Traceback (most recent call last):
   File "/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_/src/flag_gems/runtime/configloader.py", line 5, in <module>
     import triton
 ModuleNotFoundError: No module named 'triton'
+
+==================== PROBE 2026-06-16 14:23:20 ====================
+WORK=/root/JudeWorkplace
+FLAGGEMS=/root/JudeWorkplace/FlagGems_minimax_2_7
+TEST=/root/JudeWorkplace/TianshuOperatorTest
+PY=/usr/bin/python3
+
+===== repo files =====
+/tmp/FlagGems-upload
+total 272
+drwxr-xr-x 3 root root   4096 Jun 15 21:33 .
+drwxr-xr-x 4 1002 1002   4096 Jun 15 21:33 ..
+-rw-r--r-- 1 root root  14320 Jun 15 21:33 add_failure_reasons.py
+-rw-r--r-- 1 root root 113518 Jun 15 21:33 all_operator_commands.csv
+-rw-r--r-- 1 root root   7694 Jun 15 21:33 fill_excel_results.py
+-rw-r--r-- 1 root root  12646 Jun 15 21:33 fix_remaining_skipped.py
+drwxr-xr-x 8 root root   4096 Jun 15 21:33 .git
+-rw-r--r-- 1 root root   1110 Jun 15 21:33 .gitignore
+-rw-r--r-- 1 root root  15292 Jun 15 21:33 retest_skipped.py
+-rw-r--r-- 1 root root  60179 Jun 15 21:33 run_parallel_tests.py
+-rw-r--r-- 1 root root  28475 Jun 15 21:33 run_parallel_tests_tianshu.py
+total 224
+drwxr-xr-x  21 root root  4096 Jun 16 14:22 .
+drwxr-xr-x   4 1002 1002  4096 Jun 15 21:33 ..
+drwxr-xr-x   5 root root  4096 Jun 15 21:23 benchmark
+-rw-r--r--   1 root root   787 Jun 15 21:23 .clang-format
+drwxr-xr-x   2 root root  4096 Jun 15 21:23 cmake
+-rw-r--r--   1 root root  6364 Jun 15 21:23 CMakeLists.txt
+-rw-r--r--   1 root root  7050 Jun 16 14:23 cmd_output.txt
+-rw-r--r--   1 root root  5450 Jun 15 21:23 CODE_OF_CONDUCT.md
+drwxr-xr-x   2 root root  4096 Jun 15 21:23 conf
+drwxr-xr-x   2 root root  4096 Jun 15 21:23 container
+-rw-r--r--   1 root root  2151 Jun 15 21:23 CONTRIBUTING_cn.md
+-rw-r--r--   1 root root  2256 Jun 15 21:23 CONTRIBUTING.md
+-rw-r--r--   1 root root    90 Jun 15 21:23 .coveragerc
+drwxr-xr-x   2 root root  4096 Jun 15 21:23 ctests
+drwxr-xr-x   2 root root  4096 Jun 15 21:23 examples
+drwxr-xr-x   4 root root  4096 Jun 15 21:23 experimental_tests
+drwxr-xr-x   2 root root  4096 Jun 15 21:23 flag_tree_requirements
+drwxr-xr-x   9 root root  4096 Jun 15 22:07 .git
+-rw-r--r--   1 root root   111 Jun 15 21:23 .gitattributes
+drwxr-xr-x   5 root root  4096 Jun 15 21:23 .github
+-rw-r--r--   1 root root   595 Jun 15 21:23 .gitignore
+-rw-r--r--   1 root root   113 Jun 15 21:23 .gitmodules
+drwxr-xr-x   3 root root  4096 Jun 15 21:23 include
+drwxr-xr-x   3 root root  4096 Jun 15 21:23 lib
+-rw-r--r--   1 root root 10174 Jun 15 21:23 LICENSE
+-rw-r--r--   1 root root   323 Jun 15 21:23 MAINTAINERS.md
+-rw-r--r--   1 root root   984 Jun 15 21:23 mkdocs.yml
+drwxr-xr-x   2 root root  4096 Jun 15 21:23 modules_tests
+-rw-r--r--   1 root root   840 Jun 15 21:23 .pre-commit-config.yaml
+-rw-r--r--   1 root root  5681 Jun 15 21:23 pyproject.toml
+-rw-r--r--   1 root root   101 Jun 15 21:23 pytest.ini
+-rw-r--r--   1 root root  4625 Jun 15 21:23 README_cn.md
+-rw-r--r--   1 root root  4826 Jun 15 21:23 README.md
+-rw-r--r--   1 root root   519 Jun 15 21:23 SECURITY.md
+drwxr-xr-x   3 root root  4096 Jun 15 21:23 src
+drwxr-xr-x   3 root root  4096 Jun 15 21:23 Testing
+drwxr-xr-x   4 root root  4096 Jun 15 21:23 tests
+drwxr-xr-x   3 root root  4096 Jun 15 21:23 tools
+drwxr-xr-x   2 root root  4096 Jun 15 21:23 triton_src
+drwxr-xr-x 689 root root 32768 Jun 15 21:51 .worktrees
+687
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-DynamicQuantizeLinear
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-LeakyReLU
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-arcsin
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-atan2_
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-convolution
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-linear_backward
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-_scaled_dot_product_fused_attention_overrideable
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-gcd_
+/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-Paged_Attention
+
+===== efsmi =====
+-------------------------------------------------------------------------------
+--------------------- Enflame System Management Interface ---------------------
+--------- Enflame Tech, All Rights Reserved. 2024-2026 Copyright (C) ----------
+-------------------------------------------------------------------------------
+                                                                               
++2026-06-16, 14:23:20 CST-----------------------------------------------------+
+| EFSMI: 1.7.2.23          Driver Ver: 1.7.2.23                               |
++-----------------------------+-------------------+---------------------------+
+| DEV    NAME                 | Boot FW VER       | BUS-ID      ECC           |
+| TEMP   Lpm   Pwr(Usage/Cap) | Mem      GCU Virt | DUsed       SN            |
+|=============================================================================|
+| 0      Enflame L300         | 40.2.8.3          | 00:2d:00.0  Enable        |
+| 31℃    LP1      69W / 300W  | 147456MiB Disable | 0%          A084P50610001 |
++-----------------------------+-------------------+---------------------------+
+
+===== python locations =====
+/usr/bin/python
+/bin/python
+/usr/bin/python3
+/bin/python3
+/usr/bin/pip
+/bin/pip
+/usr/bin/pip3
+/bin/pip3
+
+===== pip packages current python =====
+pip 24.0 from /usr/lib/python3/dist-packages/pip (python 3.12)
+numpy              1.26.4
+pytest             9.0.1
+pytest-regex       0.2.0
+scipy              1.14.0
+torch              2.10.0+cpu
+torch_gcu          2.10.0+3.7.20260408
+torchaudio         2.10.0+cpu
+torchvision        0.25.0+cpu
+
+===== python imports current python =====
+[W616 14:23:22.508314092 gcu_caching_allocator.cpp:2944] Warning: [GCU Allocator] Static initialization: PYTORCH_GCU_ALLOC_CONF="(not set, using default)", selected_backend=native (function BackendStaticInitializer)
+torch OK 2.10.0+cpu
+torch_gcu OK 2.10.0+3.7.20260408
+triton FAIL ModuleNotFoundError("No module named 'triton'")
+triton_gcu FAIL ModuleNotFoundError("No module named 'triton_gcu'")
+flagtree FAIL ModuleNotFoundError("No module named 'flagtree'")
+flag_gems FAIL ModuleNotFoundError("No module named 'flag_gems'")
+pytest OK 9.0.1
+openpyxl FAIL ModuleNotFoundError("No module named 'openpyxl'")
+
+===== torch.gcu current python =====
+[W616 14:23:26.735048599 gcu_caching_allocator.cpp:2944] Warning: [GCU Allocator] Static initialization: PYTORCH_GCU_ALLOC_CONF="(not set, using default)", selected_backend=native (function BackendStaticInitializer)
+torch: 2.10.0+cpu
+has torch.gcu: True
+gcu available: True
+gcu count: 1
+current device: 0
+
+===== visible env test =====
+----- CUDA_VISIBLE_DEVICES='' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- CUDA_VISIBLE_DEVICES='0' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- CUDA_VISIBLE_DEVICES='99' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- TOPS_VISIBLE_DEVICES='' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- TOPS_VISIBLE_DEVICES='0' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- TOPS_VISIBLE_DEVICES='99' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- GCU_VISIBLE_DEVICES='' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- GCU_VISIBLE_DEVICES='0' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- GCU_VISIBLE_DEVICES='99' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- ENFLAME_VISIBLE_DEVICES='' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- ENFLAME_VISIBLE_DEVICES='0' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+----- ENFLAME_VISIBLE_DEVICES='99' -----
+  File "<stdin>", line 8
+    except Exception as e:
+TabError: inconsistent use of tabs and spaces in indentation
+
+===== flag_gems sample import =====
+SAMPLE_WT=/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_
+[W616 14:23:30.166972891 gcu_caching_allocator.cpp:2944] Warning: [GCU Allocator] Static initialization: PYTORCH_GCU_ALLOC_CONF="(not set, using default)", selected_backend=native (function BackendStaticInitializer)
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+  File "/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_/src/flag_gems/__init__.py", line 6, in <module>
+    from flag_gems import testing  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_/src/flag_gems/testing/__init__.py", line 3, in <module>
+    from flag_gems import runtime
+  File "/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_/src/flag_gems/runtime/__init__.py", line 3, in <module>
+    from .configloader import ConfigLoader
+  File "/root/JudeWorkplace/FlagGems_minimax_2_7/.worktrees/gen-detach_/src/flag_gems/runtime/configloader.py", line 5, in <module>
+    import triton
+ModuleNotFoundError: No module named 'triton'
+==================== PROBE END ====================

@@ -50,8 +50,7 @@ def test_perf_conv1d():
             "padding": padding,
         },
 
-    if flag_gems.device == "cuda":
-        torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     bench = Conv1DBenchmark(
         input_fn=conv1d_input_fn,
         op_name="conv1d",
@@ -111,8 +110,7 @@ def test_perf_conv2d():
 
     if flag_gems.vendor_name == "hygon":
         os.environ["TRITON_HIP_USE_NEW_STREAM_PIPELINE"] = "0"
-    if flag_gems.device == "cuda":
-        torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     bench = Conv2DBenchmark(
         input_fn=conv2d_input_fn,
         op_name="conv2d",
@@ -161,8 +159,7 @@ def test_perf_conv3d():
             "padding": padding,
         },
 
-    if flag_gems.device == "cuda":
-        torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     bench = Conv3DBenchmark(
         input_fn=conv3d_input_fn,
         op_name="conv3d",
@@ -238,8 +235,7 @@ def test_perf_cudnnconvbwd():
             "groups": groups,
         },
 
-    if flag_gems.device == "cuda":
-        torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     bench = CudnnConvBwdBenchmark(
         input_fn=cudnnconvbwd_input_fn,
         op_name="cudnnconvbwd",

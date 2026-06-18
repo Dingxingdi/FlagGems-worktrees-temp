@@ -50,7 +50,8 @@ def test_perf_conv1d():
             "padding": padding,
         },
 
-    torch.backends.cudnn.allow_tf32 = False
+    if flag_gems.device == "cuda":
+        torch.backends.cudnn.allow_tf32 = False
     bench = Conv1DBenchmark(
         input_fn=conv1d_input_fn,
         op_name="conv1d",
@@ -110,7 +111,8 @@ def test_perf_conv2d():
 
     if flag_gems.vendor_name == "hygon":
         os.environ["TRITON_HIP_USE_NEW_STREAM_PIPELINE"] = "0"
-    torch.backends.cudnn.allow_tf32 = False
+    if flag_gems.device == "cuda":
+        torch.backends.cudnn.allow_tf32 = False
     bench = Conv2DBenchmark(
         input_fn=conv2d_input_fn,
         op_name="conv2d",
@@ -159,7 +161,8 @@ def test_perf_conv3d():
             "padding": padding,
         },
 
-    torch.backends.cudnn.allow_tf32 = False
+    if flag_gems.device == "cuda":
+        torch.backends.cudnn.allow_tf32 = False
     bench = Conv3DBenchmark(
         input_fn=conv3d_input_fn,
         op_name="conv3d",
@@ -212,7 +215,8 @@ def test_perf_depthwise2d():
             "dilation": 1,
         },
 
-    torch.backends.cudnn.allow_tf32 = False
+    if flag_gems.device == "cuda":
+        torch.backends.cudnn.allow_tf32 = False
     bench = Depthwise2DBenchmark(
         input_fn=depthwise2d_input_fn,
         op_name="depthwise2d",

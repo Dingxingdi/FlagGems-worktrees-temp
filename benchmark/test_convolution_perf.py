@@ -50,8 +50,7 @@ def test_perf_conv1d():
             "padding": padding,
         },
 
-    if flag_gems.device == "cuda":
-        torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     bench = Conv1DBenchmark(
         input_fn=conv1d_input_fn,
         op_name="conv1d",
@@ -115,8 +114,7 @@ def conv2d_input_fn(shape, dtype, device):
 def test_perf_conv2d():
     if flag_gems.vendor_name == "hygon":
         os.environ["TRITON_HIP_USE_NEW_STREAM_PIPELINE"] = "0"
-    if flag_gems.device == "cuda":
-        torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     bench = Conv2DBenchmark(
         input_fn=conv2d_input_fn,
         op_name="conv2d",
@@ -165,8 +163,7 @@ def test_perf_conv3d():
             "padding": padding,
         },
 
-    if flag_gems.device == "cuda":
-        torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     bench = Conv3DBenchmark(
         input_fn=conv3d_input_fn,
         op_name="conv3d",
@@ -195,8 +192,7 @@ def conv_gelu_torch_op(**kwargs):
 def test_perf_conv_gelu():
     if flag_gems.vendor_name == "hygon":
         os.environ["TRITON_HIP_USE_NEW_STREAM_PIPELINE"] = "0"
-    if flag_gems.device == "cuda":
-        torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     bench = ConvGELUBenchmark(
         input_fn=conv2d_input_fn,  # Use Conv2DBenchmark's input_fn
         op_name="conv_gelu",

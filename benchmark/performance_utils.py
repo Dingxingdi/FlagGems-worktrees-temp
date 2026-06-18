@@ -36,6 +36,10 @@ if device == "musa":
 elif device == "npu":
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
+elif device == "gcu":
+    # torch_gcu does not expose torch.backends.gcu. Its profiler uses the
+    # CUDA matmul flag for FP32/TF32 checks, so keep that disabled for GCU too.
+    torch.backends.cuda.matmul.allow_tf32 = False
 else:
     torch_backend_device.matmul.allow_tf32 = False
 

@@ -43,7 +43,7 @@ jobs:
       cancel-in-progress: true
     runs-on: jiuding
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: |
           pip install pytest-md-report
       - shell: bash
@@ -78,7 +78,7 @@ jobs:
       cancel-in-progress: true
     runs-on: jiuding
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - shell: bash
         run: tools/gpu_check.sh
       - shell: bash

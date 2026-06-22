@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: cpp
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - shell: bash
         run: |
           CXX=/usr/bin/g++-11 CC=/usr/bin/gcc-11 SKBUILD_CMAKE_ARGS="-DFLAGGEMS_BUILD_C_EXTENSIONS=ON" pip install --no-build-isolation -v -e .

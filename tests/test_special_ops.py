@@ -2794,16 +2794,23 @@ def test_accuracy__embedding_bag_dense_backward(num_bags, embedding_dim, dtype):
     offsets = torch.tensor([0] + list(torch.cumsum(torch.tensor(bag_sizes_list), dim=0).tolist())[:-1],
                            dtype=torch.long, device=device)
 
-    # Forward pass to get offset2bag, bag_size, maximum_indices
-    output, offset2bag, bag_size, maximum_indices = torch.ops.aten._embedding_bag(
-        weight, indices, offsets, False, 0, False, None, False, -1
+    # Forward pass on CPU to get helper tensors for backward input setup.
+    ref_weight = to_reference(weight, True)
+    ref_indices = to_reference(indices)
+    ref_offsets = to_reference(offsets)
+    ref_output, ref_offset2bag, ref_bag_size, ref_maximum_indices = torch.ops.aten._embedding_bag(
+        ref_weight, ref_indices, ref_offsets, False, 0, False, None, False, -1
     )
+    offset2bag = ref_offset2bag.to(device)
+    bag_size = ref_bag_size.to(device)
+    maximum_indices = ref_maximum_indices.to(device)
 
     # Compute backward
-    grad = torch.randn_like(output)
+    grad = torch.randn(ref_output.shape, dtype=dtype, device=device)
+    ref_grad = to_reference(grad, True)
 
     ref_out = torch.ops.aten._embedding_bag_dense_backward(
-        grad, indices, offset2bag, bag_size, maximum_indices, num_weights, False, 0, None, -1
+        ref_grad, ref_indices, ref_offset2bag, ref_bag_size, ref_maximum_indices, num_weights, False, 0, None, -1
     )
     with flag_gems.use_gems():
         res_out = torch.ops.aten._embedding_bag_dense_backward(
@@ -2842,16 +2849,24 @@ def test_accuracy__embedding_bag_dense_backward_with_weights(num_bags, embedding
     offsets = torch.tensor([0] + list(torch.cumsum(torch.tensor(bag_sizes_list), dim=0).tolist())[:-1],
                            dtype=torch.long, device=device)
 
-    # Forward pass
-    output, offset2bag, bag_size, maximum_indices = torch.ops.aten._embedding_bag(
-        weight, indices, offsets, False, 0, False, per_sample_weights, False, -1
+    # Forward pass on CPU to get helper tensors for backward input setup.
+    ref_weight = to_reference(weight, True)
+    ref_indices = to_reference(indices)
+    ref_offsets = to_reference(offsets)
+    ref_per_sample_weights = to_reference(per_sample_weights, True)
+    ref_output, ref_offset2bag, ref_bag_size, ref_maximum_indices = torch.ops.aten._embedding_bag(
+        ref_weight, ref_indices, ref_offsets, False, 0, False, ref_per_sample_weights, False, -1
     )
+    offset2bag = ref_offset2bag.to(device)
+    bag_size = ref_bag_size.to(device)
+    maximum_indices = ref_maximum_indices.to(device)
 
     # Compute backward
-    grad = torch.randn_like(output)
+    grad = torch.randn(ref_output.shape, dtype=dtype, device=device)
+    ref_grad = to_reference(grad, True)
 
     ref_out = torch.ops.aten._embedding_bag_dense_backward(
-        grad, indices, offset2bag, bag_size, maximum_indices, num_weights, False, 0, per_sample_weights, -1
+        ref_grad, ref_indices, ref_offset2bag, ref_bag_size, ref_maximum_indices, num_weights, False, 0, ref_per_sample_weights, -1
     )
     with flag_gems.use_gems():
         res_out = torch.ops.aten._embedding_bag_dense_backward(
@@ -2889,16 +2904,23 @@ def test_accuracy__embedding_bag_dense_backward_mode_sum(num_bags, embedding_dim
     offsets = torch.tensor([0] + list(torch.cumsum(torch.tensor(bag_sizes_list), dim=0).tolist())[:-1],
                            dtype=torch.long, device=device)
 
-    # Forward pass with mode=1 (sum)
-    output, offset2bag, bag_size, maximum_indices = torch.ops.aten._embedding_bag(
-        weight, indices, offsets, False, 1, False, None, False, -1
+    # Forward pass with mode=1 (sum) on CPU to get helper tensors.
+    ref_weight = to_reference(weight, True)
+    ref_indices = to_reference(indices)
+    ref_offsets = to_reference(offsets)
+    ref_output, ref_offset2bag, ref_bag_size, ref_maximum_indices = torch.ops.aten._embedding_bag(
+        ref_weight, ref_indices, ref_offsets, False, 1, False, None, False, -1
     )
+    offset2bag = ref_offset2bag.to(device)
+    bag_size = ref_bag_size.to(device)
+    maximum_indices = ref_maximum_indices.to(device)
 
     # Compute backward
-    grad = torch.randn_like(output)
+    grad = torch.randn(ref_output.shape, dtype=dtype, device=device)
+    ref_grad = to_reference(grad, True)
 
     ref_out = torch.ops.aten._embedding_bag_dense_backward(
-        grad, indices, offset2bag, bag_size, maximum_indices, num_weights, False, 1, None, -1
+        ref_grad, ref_indices, ref_offset2bag, ref_bag_size, ref_maximum_indices, num_weights, False, 1, None, -1
     )
     with flag_gems.use_gems():
         res_out = torch.ops.aten._embedding_bag_dense_backward(

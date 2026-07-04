@@ -240,13 +240,17 @@ def setup_once(request):
 @pytest.fixture(scope="function", autouse=True)
 def clear_function_cache():
     yield
-    torch_device_fn.empty_cache()
+    empty_cache = getattr(torch_device_fn, "empty_cache", None)
+    if empty_cache is not None:
+        empty_cache()
 
 
 @pytest.fixture(scope="module", autouse=True)
 def clear_module_cache():
     yield
-    torch_device_fn.empty_cache()
+    empty_cache = getattr(torch_device_fn, "empty_cache", None)
+    if empty_cache is not None:
+        empty_cache()
 
 
 @pytest.fixture()

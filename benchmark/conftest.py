@@ -297,6 +297,7 @@ if _ptpu_branch_op.startswith("gen-"):
 
 _ptpu_orig_rand = _ptpu_patch_torch.rand
 _ptpu_orig_rand_like = _ptpu_patch_torch.rand_like
+_ptpu_orig_randn_like = _ptpu_patch_torch.randn_like
 _ptpu_orig_randn = _ptpu_patch_torch.randn
 _ptpu_orig_randint = _ptpu_patch_torch.randint
 _ptpu_orig_eye = _ptpu_patch_torch.eye
@@ -340,6 +341,10 @@ def _ptpu_cpu_first_rand_like(input, *args, **kwargs):
     return _ptpu_cpu_first_like(_ptpu_orig_rand_like, ("rand_like",), input, *args, **kwargs)
 
 
+def _ptpu_cpu_first_randn_like(input, *args, **kwargs):
+    return _ptpu_cpu_first_like(_ptpu_orig_randn_like, ("randn_like", "normal", "normal_"), input, *args, **kwargs)
+
+
 def _ptpu_cpu_first_randn(*args, **kwargs):
     return _ptpu_cpu_first_factory(_ptpu_orig_randn, ("randn", "normal", "normal_"), *args, **kwargs)
 
@@ -377,6 +382,7 @@ def _ptpu_cpu_first_bernoulli_(self, *args, **kwargs):
 
 _ptpu_patch_torch.rand = _ptpu_cpu_first_rand
 _ptpu_patch_torch.rand_like = _ptpu_cpu_first_rand_like
+_ptpu_patch_torch.randn_like = _ptpu_cpu_first_randn_like
 _ptpu_patch_torch.randn = _ptpu_cpu_first_randn
 _ptpu_patch_torch.randint = _ptpu_cpu_first_randint
 _ptpu_patch_torch.eye = _ptpu_cpu_first_eye

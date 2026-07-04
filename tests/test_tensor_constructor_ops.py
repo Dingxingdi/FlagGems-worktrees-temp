@@ -15,8 +15,7 @@ from .accuracy_utils import (
     POINTWISE_SHAPES,
     gems_assert_close,
     gems_assert_equal,
-    to_reference,
-)
+    to_reference)
 from .conftest import TO_CPU
 
 device = flag_gems.device
@@ -222,8 +221,7 @@ def test_accuracy_randperm(n, dtype):
         (8192, 4096),
         (4096, 8192),
     ]
-    + [(2**d, 2**d) for d in range(7, 13)],
-)
+    + [(2**d, 2**d) for d in range(7, 13)])
 @pytest.mark.parametrize("dtype", ALL_INT_DTYPES + ALL_FLOAT_DTYPES + BOOL_TYPES)
 def test_accuracy_eye(shape, dtype):
     if (
@@ -244,8 +242,7 @@ def test_accuracy_eye(shape, dtype):
         res_out = torch.eye(n, m, dtype=dtype, device=flag_gems.device)
     gems_assert_equal(
         res_out,
-        torch.eye(n, m, dtype=dtype, device="cpu" if TO_CPU else device),
-    )
+        torch.eye(n, m, dtype=dtype, device="cpu" if TO_CPU else device))
 
     # test eye(n)
     with flag_gems.use_gems():
@@ -257,8 +254,7 @@ def test_accuracy_eye(shape, dtype):
         res_out = torch.eye(n, dtype=dtype, device=flag_gems.device)
     gems_assert_equal(
         res_out,
-        torch.eye(n, dtype=dtype, device="cpu" if TO_CPU else device),
-    )
+        torch.eye(n, dtype=dtype, device="cpu" if TO_CPU else device))
 
 
 @pytest.mark.one_hot
@@ -272,15 +268,13 @@ def test_accuracy_one_hot():
     t = gems_one_hot(x)
     expected = torch.tensor(
         [[0, 0, 0, 1, 0], [0, 0, 0, 0, 1], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]],
-        device=expected_device,
-    )
+        device=expected_device)
     gems_assert_equal(t, expected)
 
     t = gems_one_hot(x, -1)
     expected = torch.tensor(
         [[0, 0, 0, 1, 0], [0, 0, 0, 0, 1], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]],
-        device=expected_device,
-    )
+        device=expected_device)
     gems_assert_equal(t, expected)
 
     t = gems_one_hot(x, 6)
@@ -291,16 +285,14 @@ def test_accuracy_one_hot():
             [0, 1, 0, 0, 0, 0],
             [1, 0, 0, 0, 0, 0],
         ],
-        device=expected_device,
-    )
+        device=expected_device)
     gems_assert_equal(t, expected)
 
     x2 = torch.tensor([[3, 4], [1, 0]], device=device, dtype=torch.int64)
     t = gems_one_hot(x2)
     expected = torch.tensor(
         [[[0, 0, 0, 1, 0], [0, 0, 0, 0, 1]], [[0, 1, 0, 0, 0], [1, 0, 0, 0, 0]]],
-        device=expected_device,
-    )
+        device=expected_device)
     gems_assert_equal(t, expected)
 
     x0 = torch.tensor(4, device=device, dtype=torch.int64)
@@ -340,8 +332,7 @@ def test_accuracy_one_hot():
         (0, 10, 2),
         (0.0, 5.0, 0.5),
         (1.0, 10.0, 1.5),
-    ],
-)
+    ])
 @pytest.mark.parametrize("dtype", [torch.float32, torch.float16, torch.int64])
 def test_accuracy_arange_start(start, end, step, dtype):
     if dtype == torch.int64 and isinstance(step, float) and int(step) == 0:
@@ -407,8 +398,7 @@ def test_accuracy_zero_out(shape, dtype):
         ((10, 20), (20, 1)),
         ((100, 200), (1, 100)),
         ((100, 200), (200, 1)),
-    ],
-)
+    ])
 @pytest.mark.parametrize("dtype", FLOAT_DTYPES + ALL_INT_DTYPES)
 def test_accuracy_empty_strided(shape, stride, dtype):
     from flag_gems.ops.empty_strided import empty_strided as gems_empty_strided

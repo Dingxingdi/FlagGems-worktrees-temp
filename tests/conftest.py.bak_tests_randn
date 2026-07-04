@@ -166,33 +166,3 @@ def pytest_terminal_summary(terminalreporter):
 
     with open("result.json", "w") as json_file:
         json.dump(existing_data, json_file, indent=4, default=str)
-
-# PTPU does not implement random tensor fill kernels used by test input setup.
-# Build random inputs on CPU first, then move them to the FlagGems device.
-import torch as _ptpu_patch_torch
-import flag_gems as _ptpu_patch_flag_gems
-
-_ptpu_orig_randn = _ptpu_patch_torch.randn
-_ptpu_orig_randint = _ptpu_patch_torch.randint
-
-def _ptpu_target_device(device):
-    return str(device) == str(_ptpu_patch_flag_gems.device)
-
-def _ptpu_cpu_first_randn(*args, **kwargs):
-    device = kwargs.get("device")
-    if _ptpu_target_device(device):
-        kwargs = dict(kwargs)
-        kwargs.pop("device", None)
-        return _ptpu_orig_randn(*args, **kwargs).to(device)
-    return _ptpu_orig_randn(*args, **kwargs)
-
-def _ptpu_cpu_first_randint(*args, **kwargs):
-    device = kwargs.get("device")
-    if _ptpu_target_device(device):
-        kwargs = dict(kwargs)
-        kwargs.pop("device", None)
-        return _ptpu_orig_randint(*args, **kwargs).to(device)
-    return _ptpu_orig_randint(*args, **kwargs)
-
-_ptpu_patch_torch.randn = _ptpu_cpu_first_randn
-_ptpu_patch_torch.randint = _ptpu_cpu_first_randint

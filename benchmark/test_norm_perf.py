@@ -16,6 +16,21 @@ from benchmark.performance_utils import (
 )
 
 
+def randn_for_device(*args, **kwargs):
+    device = kwargs.get("device")
+    if device is not None and str(device).startswith("ptpu"):
+        kwargs = dict(kwargs)
+        kwargs["device"] = "cpu"
+        return torch.randn(*args, **kwargs).to(device)
+    return torch.randn(*args, **kwargs)
+
+
+def randn_like_for_device(inp):
+    if inp.device.type == "ptpu":
+        return torch.randn_like(inp.cpu()).to(inp.device)
+    return torch.randn_like(inp)
+
+
 class NormBenchmark(GenericBenchmark):
     # TODO: add new metric
 
@@ -32,7 +47,7 @@ class NormBenchmark(GenericBenchmark):
 
 
 def groupnorm_input_fn(shape, dtype, device):
-    inp = torch.randn(shape, dtype=dtype, device=device)
+    inp = randn_for_device(shape, dtype=dtype, device=device)
     channel = shape[1]
     weight = torch.randn(
         [
@@ -54,7 +69,7 @@ def groupnorm_input_fn(shape, dtype, device):
 
 
 def layernorm_input_fn(shape, dtype, device):
-    inp = torch.randn(shape, dtype=dtype, device=device)
+    inp = randn_for_device(shape, dtype=dtype, device=device)
     layer_shape = shape[1:]
     weight = torch.randn(layer_shape, dtype=dtype, device=device)
     bias = torch.randn(layer_shape, dtype=dtype, device=device)
@@ -63,9 +78,9 @@ def layernorm_input_fn(shape, dtype, device):
 
 def instancenorm_input_fn(shape, dtype, device):
     C = shape[1]
-    inp = torch.randn(shape, dtype=dtype, device=device)
-    weight = torch.randn((C,), dtype=dtype, device=device)
-    bias = torch.randn((C,), dtype=dtype, device=device)
+    inp = randn_for_device(shape, dtype=dtype, device=device)
+    weight = randn_for_device((C,), dtype=dtype, device=device)
+    bias = randn_for_device((C,), dtype=dtype, device=device)
     running_mean = None
     running_var = None
     use_input_stats = True
@@ -74,16 +89,16 @@ def instancenorm_input_fn(shape, dtype, device):
     cudnn_enabled = True
     yield inp, weight, bias, running_mean, running_var, use_input_stats, momentum, eps, cudnn_enabled
     if Config.bench_level == BenchLevel.COMPREHENSIVE:
-        running_mean = torch.randn((C,), dtype=dtype, device=device)
-        running_var = torch.randn((C,), dtype=dtype, device=device)
+        running_mean = randn_for_device((C,), dtype=dtype, device=device)
+        running_var = randn_for_device((C,), dtype=dtype, device=device)
         yield inp, weight, bias, running_mean, running_var, use_input_stats, momentum, eps, cudnn_enabled
 
 
 def batchnorm_input_fn(shape, dtype, device):
     C = shape[1]
-    inp = torch.randn(shape, dtype=dtype, device=device)
-    weight = torch.randn((C,), dtype=dtype, device=device)
-    bias = torch.randn((C,), dtype=dtype, device=device)
+    inp = randn_for_device(shape, dtype=dtype, device=device)
+    weight = randn_for_device((C,), dtype=dtype, device=device)
+    bias = randn_for_device((C,), dtype=dtype, device=device)
     running_mean = None
     running_var = None
     training = True
@@ -93,8 +108,8 @@ def batchnorm_input_fn(shape, dtype, device):
     yield inp, weight, bias, running_mean, running_var, training, momentum, eps, cudnn_enabled
 
     if Config.bench_level == BenchLevel.COMPREHENSIVE:
-        running_mean = torch.randn((C,), dtype=dtype, device=device)
-        running_var = torch.randn((C,), dtype=dtype, device=device)
+        running_mean = randn_for_device((C,), dtype=dtype, device=device)
+        running_var = randn_for_device((C,), dtype=dtype, device=device)
         yield inp, weight, bias, running_mean, running_var, training, momentum, eps, cudnn_enabled
 
 
@@ -165,7 +180,7 @@ def test_perf_batch_norm_backward():
                 _,
             ) = forward_args
 
-            grad_output = torch.randn_like(inp)
+            grad_output = randn_like_for_device(inp)
             channels = weight.shape[0] if weight is not None else inp.shape[1]
 
             if running_mean is None:
@@ -173,8 +188,8 @@ def test_perf_batch_norm_backward():
             if running_var is None:
                 running_var = torch.ones(channels, dtype=dtype, device=device)
 
-            save_mean = torch.randn(channels, dtype=torch.float32, device=device)
-            save_invstd = torch.randn(channels, dtype=torch.float32, device=device)
+            save_mean = randn_for_device(channels, dtype=torch.float32, device=device)
+            save_invstd = randn_for_device(channels, dtype=torch.float32, device=device)
             output_mask = [True, weight is not None, bias is not None]
 
             yield (
@@ -247,7 +262,7 @@ def test_weight_vector_norm_benchmark(op_name, torch_op, input_fn):
 def test_perf_rms_norm():
     def rms_norm_input_fn(shape, dtype, device):
         M, N = shape
-        inp = torch.randn(shape, dtype=dtype, device=device)
+        inp = randn_for_device(shape, dtype=dtype, device=device)
         weight = torch.randn(N, dtype=dtype, device=device)
         yield inp, (N,), weight
 

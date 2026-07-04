@@ -2848,8 +2848,9 @@ def test_accuracy_dyn_quant_pack_4bit_weight(shape, dtype, group_size):
     torch.manual_seed(42)
     x = torch.randn(shape, dtype=dtype, device=flag_gems.device)
 
+    ref_x = to_reference(x, True)
     ref_qweight, ref_scales, ref_zeros = native_dyn_quant_pack_4bit_weight(
-        x, group_size
+        ref_x, group_size
     )
 
     with flag_gems.use_gems():

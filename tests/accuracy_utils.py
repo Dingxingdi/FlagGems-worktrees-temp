@@ -212,12 +212,34 @@ STACK_DIM_LIST = [-2, -1, 0, 1]
 ARANGE_START = [0] if TO_CPU else [0, 1, 3]
 
 
+def _ptpu_compare_on_cpu():
+    return str(flag_gems.device).startswith("ptpu")
+
+
+def _ptpu_to_cpu_for_reference(inp):
+    if isinstance(inp, torch.Tensor) and _ptpu_compare_on_cpu():
+        return inp.to("cpu")
+    return inp
+
+
+def _ptpu_to_cpu_for_compare(value):
+    if isinstance(value, torch.Tensor):
+        return value.to("cpu")
+    if isinstance(value, tuple):
+        return tuple(_ptpu_to_cpu_for_compare(item) for item in value)
+    if isinstance(value, list):
+        return [_ptpu_to_cpu_for_compare(item) for item in value]
+    return value
+
+
 def to_reference(inp, upcast=False):
     if inp is None:
         return None
     ref_inp = inp
     if TO_CPU:
         ref_inp = ref_inp.to("cpu")
+    else:
+        ref_inp = _ptpu_to_cpu_for_reference(ref_inp)
     if upcast:
         if ref_inp.is_complex():
             ref_inp = ref_inp.to(torch.complex128)
@@ -227,21 +249,21 @@ def to_reference(inp, upcast=False):
 
 
 def to_cpu(res, ref):
-    if TO_CPU and isinstance(res, torch.Tensor) and isinstance(ref, torch.Tensor):
-        res = res.to("cpu")
-        assert ref.device == torch.device("cpu")
-    return res
+    if TO_CPU or _ptpu_compare_on_cpu():
+        res = _ptpu_to_cpu_for_compare(res)
+        ref = _ptpu_to_cpu_for_compare(ref)
+    return res, ref
 
 
 def gems_assert_close(res, ref, dtype, equal_nan=False, reduce_dim=1, atol=1e-4):
-    res = to_cpu(res, ref)
+    res, ref = to_cpu(res, ref)
     flag_gems.testing.assert_close(
         res, ref, dtype, equal_nan=equal_nan, reduce_dim=reduce_dim, atol=atol
     )
 
 
 def gems_assert_equal(res, ref, equal_nan=False):
-    res = to_cpu(res, ref)
+    res, ref = to_cpu(res, ref)
     flag_gems.testing.assert_equal(res, ref, equal_nan=equal_nan)
 
 

@@ -283,7 +283,7 @@ class Benchmark:
         fn = lambda: op(*args, **kwargs)
         if self.is_backward:
             out = fn()
-            dout = torch.randn(out.shape, dtype=out.dtype).to(out.device)
+            dout = torch.randn_like(out)
             # fn = lambda: out.backward(dout, retain_graph=True)
             xs = list(filter(lambda x: torch.is_tensor(x) and x.requires_grad, args))
             fn = lambda: torch.autograd.grad(
@@ -541,7 +541,7 @@ class GenericBenchmark2DOnly(GenericBenchmarkFilterShapes):
 
 def generate_tensor_input(shape, dtype, device):
     if dtype in FLOAT_DTYPES:
-        return torch.randn(shape, dtype=dtype).to(device)
+        return torch.randn(shape, dtype=dtype, device=device)
     elif dtype in INT_DTYPES:
         return torch.randint(
             torch.iinfo(dtype).min,
@@ -553,7 +553,7 @@ def generate_tensor_input(shape, dtype, device):
     elif dtype in BOOL_DTYPES:
         return torch.randint(0, 2, size=shape, dtype=dtype, device="cpu").to(device)
     elif dtype in COMPLEX_DTYPES:
-        return torch.randn(shape, dtype=dtype).to(device)
+        return torch.randn(shape, dtype=dtype, device=device)
 
 
 def binary_input_fn(shape, cur_dtype, device):

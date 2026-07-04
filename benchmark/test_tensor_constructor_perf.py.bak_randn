@@ -36,7 +36,7 @@ def masked_fill_input_fn(shape, dtype, device):
 
 
 def full_like_input_fn(shape, dtype, device):
-    inp = torch.randn(shape, dtype=dtype).to(device)
+    inp = torch.randn(shape, dtype=dtype, device=device)
     yield {"input": inp, "fill_value": 3.1415926},
 
 

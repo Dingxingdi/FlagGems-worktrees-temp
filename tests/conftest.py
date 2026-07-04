@@ -167,32 +167,103 @@ def pytest_terminal_summary(terminalreporter):
     with open("result.json", "w") as json_file:
         json.dump(existing_data, json_file, indent=4, default=str)
 
-# PTPU does not implement random tensor fill kernels used by test input setup.
-# Build random inputs on CPU first, then move them to the FlagGems device.
+# PTPU does not implement some factory/random kernels used by input setup.
+# Build helper inputs on CPU first, then move them to the FlagGems device.
+import os as _ptpu_patch_os
 import torch as _ptpu_patch_torch
 import flag_gems as _ptpu_patch_flag_gems
 
+_ptpu_branch_op = _ptpu_patch_os.path.basename(
+    _ptpu_patch_os.path.dirname(_ptpu_patch_os.path.dirname(__file__))
+)
+if _ptpu_branch_op.startswith("gen-"):
+    _ptpu_branch_op = _ptpu_branch_op[4:]
+
+_ptpu_orig_rand = _ptpu_patch_torch.rand
+_ptpu_orig_rand_like = _ptpu_patch_torch.rand_like
 _ptpu_orig_randn = _ptpu_patch_torch.randn
 _ptpu_orig_randint = _ptpu_patch_torch.randint
+_ptpu_orig_eye = _ptpu_patch_torch.eye
+_ptpu_orig_uniform_ = _ptpu_patch_torch.Tensor.uniform_
+_ptpu_orig_normal_ = _ptpu_patch_torch.Tensor.normal_
+_ptpu_orig_bernoulli_ = _ptpu_patch_torch.Tensor.bernoulli_
+
 
 def _ptpu_target_device(device):
-    return str(device) == str(_ptpu_patch_flag_gems.device)
+    return str(device).startswith("ptpu")
+
+
+def _ptpu_should_cpu_first(*op_names):
+    return _ptpu_branch_op not in op_names
+
+
+def _ptpu_cpu_first_factory(orig, op_names, *args, **kwargs):
+    device = kwargs.get("device")
+    if _ptpu_target_device(device) and _ptpu_should_cpu_first(*op_names):
+        kwargs = dict(kwargs)
+        kwargs.pop("device", None)
+        return orig(*args, **kwargs).to(device)
+    return orig(*args, **kwargs)
+
+
+def _ptpu_cpu_first_like(orig, op_names, input, *args, **kwargs):
+    device = kwargs.get("device", getattr(input, "device", None))
+    if _ptpu_target_device(device) and _ptpu_should_cpu_first(*op_names):
+        kwargs = dict(kwargs)
+        kwargs.pop("device", None)
+        cpu_input = input.to("cpu") if isinstance(input, _ptpu_patch_torch.Tensor) else input
+        return orig(cpu_input, *args, **kwargs).to(device)
+    return orig(input, *args, **kwargs)
+
+
+def _ptpu_cpu_first_rand(*args, **kwargs):
+    return _ptpu_cpu_first_factory(_ptpu_orig_rand, ("rand",), *args, **kwargs)
+
+
+def _ptpu_cpu_first_rand_like(input, *args, **kwargs):
+    return _ptpu_cpu_first_like(_ptpu_orig_rand_like, ("rand_like",), input, *args, **kwargs)
+
 
 def _ptpu_cpu_first_randn(*args, **kwargs):
-    device = kwargs.get("device")
-    if _ptpu_target_device(device):
-        kwargs = dict(kwargs)
-        kwargs.pop("device", None)
-        return _ptpu_orig_randn(*args, **kwargs).to(device)
-    return _ptpu_orig_randn(*args, **kwargs)
+    return _ptpu_cpu_first_factory(_ptpu_orig_randn, ("randn", "normal", "normal_"), *args, **kwargs)
+
 
 def _ptpu_cpu_first_randint(*args, **kwargs):
-    device = kwargs.get("device")
-    if _ptpu_target_device(device):
-        kwargs = dict(kwargs)
-        kwargs.pop("device", None)
-        return _ptpu_orig_randint(*args, **kwargs).to(device)
-    return _ptpu_orig_randint(*args, **kwargs)
+    return _ptpu_cpu_first_factory(_ptpu_orig_randint, ("randint",), *args, **kwargs)
 
+
+def _ptpu_cpu_first_eye(*args, **kwargs):
+    return _ptpu_cpu_first_factory(_ptpu_orig_eye, ("eye",), *args, **kwargs)
+
+
+def _ptpu_cpu_first_inplace_random(orig, op_names, self, *args, **kwargs):
+    if _ptpu_target_device(getattr(self, "device", None)) and _ptpu_should_cpu_first(*op_names):
+        cpu_self = _ptpu_patch_torch.empty_strided(
+            tuple(self.shape), self.stride(), dtype=self.dtype, device="cpu"
+        )
+        orig(cpu_self, *args, **kwargs)
+        self.copy_(cpu_self.to(self.device))
+        return self
+    return orig(self, *args, **kwargs)
+
+
+def _ptpu_cpu_first_uniform_(self, *args, **kwargs):
+    return _ptpu_cpu_first_inplace_random(_ptpu_orig_uniform_, ("uniform", "uniform_"), self, *args, **kwargs)
+
+
+def _ptpu_cpu_first_normal_(self, *args, **kwargs):
+    return _ptpu_cpu_first_inplace_random(_ptpu_orig_normal_, ("normal", "normal_"), self, *args, **kwargs)
+
+
+def _ptpu_cpu_first_bernoulli_(self, *args, **kwargs):
+    return _ptpu_cpu_first_inplace_random(_ptpu_orig_bernoulli_, ("bernoulli",), self, *args, **kwargs)
+
+
+_ptpu_patch_torch.rand = _ptpu_cpu_first_rand
+_ptpu_patch_torch.rand_like = _ptpu_cpu_first_rand_like
 _ptpu_patch_torch.randn = _ptpu_cpu_first_randn
 _ptpu_patch_torch.randint = _ptpu_cpu_first_randint
+_ptpu_patch_torch.eye = _ptpu_cpu_first_eye
+_ptpu_patch_torch.Tensor.uniform_ = _ptpu_cpu_first_uniform_
+_ptpu_patch_torch.Tensor.normal_ = _ptpu_cpu_first_normal_
+_ptpu_patch_torch.Tensor.bernoulli_ = _ptpu_cpu_first_bernoulli_

@@ -40,9 +40,11 @@ elif device == "gcu":
     # torch_gcu does not expose torch.backends.gcu. Its profiler uses the
     # CUDA matmul flag for FP32/TF32 checks, so keep that disabled for GCU too.
     torch.backends.cuda.matmul.allow_tf32 = False
+elif device == "ptpu":
+    # torch_ptpu does not expose a torch.backends.ptpu matmul TF32 switch.
+    torch.set_float32_matmul_precision("highest")
 else:
     torch_backend_device.matmul.allow_tf32 = False
-
 
 def SkipVersion(module_name, skip_pattern):
     if importlib.util.find_spec(module_name) is None:
